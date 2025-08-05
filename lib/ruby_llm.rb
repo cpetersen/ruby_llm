@@ -90,6 +90,7 @@ RubyLLM::Provider.register :ollama, RubyLLM::Providers::Ollama
 RubyLLM::Provider.register :openai, RubyLLM::Providers::OpenAI
 RubyLLM::Provider.register :openrouter, RubyLLM::Providers::OpenRouter
 RubyLLM::Provider.register :perplexity, RubyLLM::Providers::Perplexity
+RubyLLM::Provider.register :red_candle, RubyLLM::Providers::RedCandle
 
 if defined?(Rails::Railtie)
   require 'ruby_llm/railtie'

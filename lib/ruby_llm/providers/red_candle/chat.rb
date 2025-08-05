@@ -12,7 +12,7 @@ module RubyLLM
         end
 
         # Override the complete method to use red-candle directly
-        def complete(messages, tools: [], temperature: nil, model: nil, stream: false, schema: nil, &)
+        def complete(messages, tools: [], temperature: nil, model: nil, stream: false, schema: nil, connection: nil, params: {}, &)
           model_id = resolve_model(model)
           config = build_generation_config(temperature, schema)
           
@@ -64,7 +64,7 @@ module RubyLLM
         def parse_completion_response(text, llm)
           Message.new(
             content: text,
-            role: 'assistant',
+            role: :assistant,
             model: llm.model_name
           )
         end

@@ -28,6 +28,10 @@ module RubyLLM
                   :gpustack_api_base,
                   :gpustack_api_key,
                   :mistral_api_key,
+                  # Red Candle configuration
+                  :red_candle_device,
+                  :red_candle_model_cache_dir,
+                  :red_candle_default_model,
                   # Default models
                   :default_model,
                   :default_embedding_model,

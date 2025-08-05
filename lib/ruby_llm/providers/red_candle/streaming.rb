@@ -14,7 +14,7 @@ module RubyLLM
           # Convert red-candle token to ruby_llm Chunk format
           Chunk.new(
             content: token,
-            role: 'assistant',
+            role: :assistant,
             finish_reason: nil,
             model: current_model_name,
             tool_calls: []

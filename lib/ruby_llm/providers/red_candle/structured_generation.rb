@@ -18,12 +18,11 @@ module RubyLLM
           # Use red-candle's built-in structured generation
           result = llm.generate_structured(prompt, schema: schema)
           
-          # Wrap in a Message object
+          # Wrap in a Message object with JSON string content
           Message.new(
-            content: result.to_json,
-            role: 'assistant',
-            model: llm.model_name,
-            parsed: result
+            content: result.is_a?(Hash) ? result.to_json : result,
+            role: :assistant,
+            model: llm.model_name
           )
         end
 
@@ -36,7 +35,7 @@ module RubyLLM
           
           Message.new(
             content: result,
-            role: 'assistant',
+            role: :assistant,
             model: llm.model_name
           )
         end

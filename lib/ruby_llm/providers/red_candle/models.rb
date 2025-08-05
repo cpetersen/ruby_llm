@@ -51,23 +51,23 @@ module RubyLLM
         def list_models
           # Return a combination of known models and locally cached models
           models = SUPPORTED_MODELS.map do |model_id|
-            Model.new(
+            Model::Info.new(
               id: model_id,
               name: model_id.split('/').last,
               provider: 'red_candle',
-              modalities: ['text'],
+              modalities: { input: ['text'], output: ['text'] },
               capabilities: model_capabilities(model_id)
             )
           end
           
           # Add GGUF models note
-          models << Model.new(
+          models << Model::Info.new(
             id: "gguf-models",
             name: "GGUF Quantized Models",
             provider: 'red_candle',
-            modalities: ['text'],
+            modalities: { input: ['text'], output: ['text'] },
             capabilities: ['chat', 'completion'],
-            description: "Supports any GGUF quantized model from HuggingFace"
+            metadata: { description: "Supports any GGUF quantized model from HuggingFace" }
           )
           
           models
@@ -79,7 +79,7 @@ module RubyLLM
           caps = ['completion']
           
           # Add chat capability for instruction-tuned models
-          if model_id.include?('chat') || model_id.include?('instruct') || model_id.include?('-it')
+          if model_id.downcase.include?('chat') || model_id.downcase.include?('instruct') || model_id.include?('-it')
             caps << 'chat'
           end
           
