@@ -6,8 +6,6 @@ module RubyLLM
       # Structured generation support for RedCandle provider.
       # Leverages red-candle's JSON schema and regex constraints.
       module StructuredGeneration
-        module_function
-
         def supports_structured_output?(model_id)
           # All red-candle models support structured generation
           true
@@ -15,8 +13,8 @@ module RubyLLM
 
         def generate_structured(prompt, schema:, model: nil, temperature: nil)
           RedCandle.ensure_red_candle_available!
-          model_id = resolve_model(model)
-          llm = load_model(model_id)
+          model_id = RedCandle.resolve_model(model)
+          llm = RedCandle.load_model(model_id)
           
           # Use red-candle's built-in structured generation
           result = llm.generate_structured(prompt, schema: schema)
@@ -31,8 +29,8 @@ module RubyLLM
 
         def generate_regex(prompt, pattern:, model: nil, temperature: nil)
           RedCandle.ensure_red_candle_available!
-          model_id = resolve_model(model)
-          llm = load_model(model_id)
+          model_id = RedCandle.resolve_model(model)
+          llm = RedCandle.load_model(model_id)
           
           # Use red-candle's regex generation
           result = llm.generate_regex(prompt, pattern: pattern)

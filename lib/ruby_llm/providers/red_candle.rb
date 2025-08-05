@@ -62,6 +62,31 @@ module RubyLLM
           For more information, visit: https://github.com/your-org/red-candle
         ERROR
       end
+
+      def resolve_model(model)
+        # Use the provided model or fall back to configuration default
+        model || RubyLLM.configuration.red_candle_default_model || "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+      end
+
+      def load_model(model_id)
+        ensure_red_candle_available!
+        # This would be enhanced with caching in a real implementation
+        device = get_device
+        ::Candle::LLM.from_pretrained(model_id, device: device)
+      end
+
+      def get_device
+        ensure_red_candle_available!
+        device_type = RubyLLM.configuration.red_candle_device || 'cpu'
+        case device_type.to_s.downcase
+        when 'metal'
+          ::Candle::Device.metal
+        when 'cuda'
+          ::Candle::Device.cuda
+        else
+          ::Candle::Device.cpu
+        end
+      end
     end
   end
 end

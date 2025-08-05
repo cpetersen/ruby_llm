@@ -6,8 +6,6 @@ module RubyLLM
       # Chat completion implementation for RedCandle provider.
       # Handles model loading, message formatting, and response generation.
       module Chat
-        module_function
-
         # Since we're a local provider, we don't use HTTP endpoints
         def completion_url
           raise NotImplementedError, "RedCandle is a local provider and doesn't use HTTP endpoints"
@@ -27,6 +25,8 @@ module RubyLLM
             complete_sync(llm, messages, config)
           end
         end
+
+        module_function
 
         private
 
@@ -72,8 +72,7 @@ module RubyLLM
         end
 
         def resolve_model(model)
-          # Use the provided model or fall back to configuration default
-          model || RubyLLM.configuration.red_candle_default_model || "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+          RedCandle.resolve_model(model)
         end
 
         def build_generation_config(temperature, schema)
@@ -86,7 +85,7 @@ module RubyLLM
           
           # Add structured generation constraint if schema provided
           if schema
-            constraint = load_model(nil).constraint_from_schema(schema)
+            constraint = RedCandle.load_model(nil).constraint_from_schema(schema)
             base_config.constraint = constraint
           end
           
@@ -94,23 +93,11 @@ module RubyLLM
         end
 
         def load_model(model_id)
-          RedCandle.ensure_red_candle_available!
-          # This would be enhanced with caching in a real implementation
-          device = get_device
-          ::Candle::LLM.from_pretrained(model_id, device: device)
+          RedCandle.load_model(model_id)
         end
 
         def get_device
-          RedCandle.ensure_red_candle_available!
-          device_type = RubyLLM.configuration.red_candle_device || 'cpu'
-          case device_type.to_s.downcase
-          when 'metal'
-            ::Candle::Device.metal
-          when 'cuda'
-            ::Candle::Device.cuda
-          else
-            ::Candle::Device.cpu
-          end
+          RedCandle.get_device
         end
       end
     end
