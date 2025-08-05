@@ -19,6 +19,7 @@ group :development do # rubocop:disable Metrics/BlockLength
   gem 'rails'
   gem 'rake', '>= 13.0'
   gem 'rdoc'
+  gem 'red-candle' # Optional provider for local LLM inference
   gem 'reline'
   gem 'rspec', '~> 3.12'
   gem 'rubocop', '>= 1.0'

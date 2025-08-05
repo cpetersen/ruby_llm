@@ -46,6 +46,22 @@ module RubyLLM
       def local?
         true
       end
+
+      def ensure_red_candle_available!
+        return if defined?(::Candle)
+        
+        raise ConfigurationError, <<~ERROR
+          The red-candle gem is not installed. To use the RedCandle provider, please add it to your Gemfile:
+          
+            gem 'red-candle'
+          
+          Then run:
+          
+            bundle install
+          
+          For more information, visit: https://github.com/your-org/red-candle
+        ERROR
+      end
     end
   end
 end

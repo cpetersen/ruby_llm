@@ -131,6 +131,17 @@ RSpec.describe RubyLLM::Providers::RedCandle do
         expect { described_class.completion_url }.to raise_error(NotImplementedError)
       end
 
+      it 'raises helpful error when red-candle is not installed' do
+        # Temporarily hide ::Candle if it exists
+        if defined?(::Candle)
+          skip 'red-candle is installed, cannot test missing dependency error'
+        end
+        
+        expect {
+          described_class.complete("What's 2 + 2?", model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0')
+        }.to raise_error(RubyLLM::ConfigurationError, /red-candle gem is not installed/)
+      end
+
       it 'can complete a simple prompt' do
         allow(mock_llm).to receive(:generate).and_return('The answer is 4.')
         allow(::Candle::GenerationConfig).to receive(:balanced).and_return({})

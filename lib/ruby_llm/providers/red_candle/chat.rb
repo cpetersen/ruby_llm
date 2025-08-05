@@ -6,6 +6,8 @@ module RubyLLM
       # Chat completion implementation for RedCandle provider.
       # Handles model loading, message formatting, and response generation.
       module Chat
+        module_function
+
         # Since we're a local provider, we don't use HTTP endpoints
         def completion_url
           raise NotImplementedError, "RedCandle is a local provider and doesn't use HTTP endpoints"
@@ -75,6 +77,7 @@ module RubyLLM
         end
 
         def build_generation_config(temperature, schema)
+          RedCandle.ensure_red_candle_available!
           base_config = if temperature
             ::Candle::GenerationConfig.new(temperature: temperature)
           else
@@ -91,12 +94,14 @@ module RubyLLM
         end
 
         def load_model(model_id)
+          RedCandle.ensure_red_candle_available!
           # This would be enhanced with caching in a real implementation
           device = get_device
           ::Candle::LLM.from_pretrained(model_id, device: device)
         end
 
         def get_device
+          RedCandle.ensure_red_candle_available!
           device_type = RubyLLM.configuration.red_candle_device || 'cpu'
           case device_type.to_s.downcase
           when 'metal'
