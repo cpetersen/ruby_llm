@@ -65,7 +65,7 @@ RSpec.describe 'RedCandle Integration', skip: !defined?(Candle) do
         chat = RubyLLM.chat(model: model, provider: provider)
         chunks = []
 
-        response = chat.ask("Count from 1 to 3.", stream: true) do |chunk|
+        response = chat.ask("Count from 1 to 3.") do |chunk|
           chunks << chunk
           expect(chunk).to be_a(RubyLLM::Chunk)
           expect(chunk.content).to be_a(String)
@@ -99,17 +99,16 @@ RSpec.describe 'RedCandle Integration', skip: !defined?(Candle) do
           required: ['sentiment']
         }
 
-        response = chat.ask(
-          "What's the sentiment of: 'I love Ruby programming!'",
-          schema: schema
-        )
+        response = chat
+          .with_schema(schema)
+          .ask("What's the sentiment of: 'I love Ruby programming!'")
 
-        expect(response.parsed).to be_a(Hash)
-        expect(response.parsed['sentiment']).to be_in(['positive', 'negative', 'neutral'])
-        expect(response.parsed['sentiment']).to eq('positive') # Should detect positive sentiment
+        expect(response.content).to be_a(Hash)
+        expect(response.content['sentiment']).to be_in(['positive', 'negative', 'neutral'])
+        expect(response.content['sentiment']).to eq('positive') # Should detect positive sentiment
         
-        if response.parsed['confidence']
-          expect(response.parsed['confidence']).to be_between(0, 1)
+        if response.content['confidence']
+          expect(response.content['confidence']).to be_between(0, 1)
         end
       end
     end

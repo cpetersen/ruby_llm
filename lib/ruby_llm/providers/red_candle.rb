@@ -65,7 +65,7 @@ module RubyLLM
 
       def resolve_model(model)
         # Use the provided model or fall back to configuration default
-        model || RubyLLM.configuration.red_candle_default_model || "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+        model || RubyLLM.config.red_candle_default_model || "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
       end
 
       def load_model(model_id)
@@ -77,7 +77,7 @@ module RubyLLM
 
       def get_device
         ensure_red_candle_available!
-        device_type = RubyLLM.configuration.red_candle_device || 'cpu'
+        device_type = RubyLLM.config.red_candle_device || 'cpu'
         case device_type.to_s.downcase
         when 'metal'
           ::Candle::Device.metal

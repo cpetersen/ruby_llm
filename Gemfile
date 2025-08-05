@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 gemspec
 
-group :development do # rubocop:disable Metrics/BlockLength
+group :development, :test do # rubocop:disable Metrics/BlockLength
   gem 'appraisal'
   gem 'bundler', '>= 2.0'
   gem 'codecov'
