@@ -65,7 +65,12 @@ module RubyLLM
         end
 
         def supports_structured_output?(_model_id)
-          # All red-candle models support structured output
+          # All red-candle models support structured output via outlines crate
+          true
+        end
+        
+        def structured_output?(_model_id)
+          # Alternative method name used by ruby_llm
           true
         end
 

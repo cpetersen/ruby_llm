@@ -53,11 +53,18 @@ module RubyLLM
           raise ArgumentError, 'Provider must be specified if assume_exists is true' unless provider
 
           provider = Provider.providers[provider.to_sym] || raise(Error, "Unknown provider: #{provider.to_sym}")
+          
+          # Add provider-specific capabilities
+          default_capabilities = %w[function_calling streaming]
+          if provider.slug == 'red_candle'
+            default_capabilities << 'structured_output'
+          end
+          
           model = Model::Info.new(
             id: model_id,
             name: model_id.gsub('-', ' ').capitalize,
             provider: provider.slug,
-            capabilities: %w[function_calling streaming],
+            capabilities: default_capabilities,
             modalities: { input: %w[text image], output: %w[text] },
             metadata: { warning: 'Assuming model exists, capabilities may not be accurate' }
           )
