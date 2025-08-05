@@ -54,9 +54,24 @@ module RubyLLM
 
         def format_messages_for_model(llm, messages)
           # Convert messages to the format expected by red-candle
-          if messages.is_a?(Array) && messages.any? { |m| m[:role] }
-            # Chat format - use chat template
-            llm.apply_chat_template(messages)
+          if messages.is_a?(Array)
+            # Convert RubyLLM::Message objects to hash format for red-candle
+            formatted_messages = messages.map do |msg|
+              if msg.respond_to?(:to_h)
+                msg.to_h
+              else
+                msg
+              end
+            end
+            
+            # Check if it's chat format
+            if formatted_messages.any? { |m| m.is_a?(Hash) && m[:role] }
+              # Chat format - use chat template
+              llm.apply_chat_template(formatted_messages)
+            else
+              # Array of strings
+              formatted_messages.join("\n")
+            end
           else
             # Single message or string
             messages.to_s
@@ -67,7 +82,7 @@ module RubyLLM
           Message.new(
             content: text,
             role: :assistant,
-            model: llm.model_name
+            model_id: llm.model_name
           )
         end
 
