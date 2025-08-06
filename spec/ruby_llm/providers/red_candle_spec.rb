@@ -2,9 +2,12 @@
 
 require 'spec_helper'
 
+# Load stub if red-candle gem is not available
+unless defined?(::Candle)
+  require_relative '../../support/red_candle_stub'
+end
+
 RSpec.describe RubyLLM::Providers::RedCandle do
-  # Since red-candle is a local provider, we'll mock the actual gem to avoid dependencies
-  # This follows the pattern used for other providers that require external dependencies
 
   describe 'provider interface' do
     it 'has the correct slug' do
@@ -113,14 +116,6 @@ RSpec.describe RubyLLM::Providers::RedCandle do
     let(:config) { RubyLLM::Configuration.new }
 
     before do
-      # Mock the Candle module if it's not available
-      unless defined?(::Candle)
-        stub_const('::Candle', Module.new)
-        stub_const('::Candle::LLM', Class.new)
-        stub_const('::Candle::Device', Class.new)
-        stub_const('::Candle::GenerationConfig', Class.new)
-      end
-
       allow(::Candle::Device).to receive(:cpu).and_return(mock_device)
       allow(::Candle::LLM).to receive(:from_pretrained).and_return(mock_llm)
       allow(mock_llm).to receive(:model_name).and_return('TinyLlama/TinyLlama-1.1B-Chat-v1.0')
