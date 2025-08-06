@@ -23,7 +23,7 @@ module RubyLLM
           Message.new(
             content: result.is_a?(Hash) ? result.to_json : result,
             role: :assistant,
-            model: llm.model_name
+            model_id: llm.model_name
           )
         end
 
@@ -38,7 +38,7 @@ module RubyLLM
           Message.new(
             content: result,
             role: :assistant,
-            model: llm.model_name
+            model_id: llm.model_name
           )
         end
 

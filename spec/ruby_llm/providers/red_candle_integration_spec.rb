@@ -33,7 +33,7 @@ RSpec.describe 'RedCandle Integration', skip: !defined?(Candle) do
         expect(response.content).not_to be_empty
         expect(response.role).to eq(:assistant)
         # Red-candle doesn't track tokens by default
-        expect(response.model).to eq(model)
+        expect(response.model_id).to eq(model)
       end
 
       it "#{provider}/#{model} can handle multi-turn conversations" do

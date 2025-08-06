@@ -10,13 +10,13 @@ module RubyLLM
           raise NotImplementedError, "RedCandle is a local provider and doesn't use HTTP endpoints"
         end
 
-        def build_chunk(token, accumulated_text = nil)
+        def build_chunk(token, accumulated_text = nil, model_name = nil)
           # Convert red-candle token to ruby_llm Chunk format
           Chunk.new(
             content: token,
             role: :assistant,
             finish_reason: nil,
-            model: current_model_name,
+            model_id: model_name || current_model_name,
             tool_calls: []
           )
         end

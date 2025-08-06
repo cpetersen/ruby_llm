@@ -148,7 +148,7 @@ RSpec.describe RubyLLM::Providers::RedCandle do
 
         # We need to stub the complete method since it's complex
         allow(described_class).to receive(:complete).and_return(
-          RubyLLM::Message.new(content: 'The answer is 4.', role: 'assistant', model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0')
+          RubyLLM::Message.new(content: 'The answer is 4.', role: :assistant, model_id: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0')
         )
 
         result = described_class.complete("What's 2 + 2?", model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0')
@@ -174,9 +174,9 @@ RSpec.describe RubyLLM::Providers::RedCandle do
             tokens.each do |token|
               chunk = RubyLLM::Chunk.new(
                 content: token,
-                role: 'assistant',
+                role: :assistant,
                 finish_reason: nil,
-                model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+                model_id: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
                 tool_calls: []
               )
               block.call(chunk)
@@ -184,8 +184,8 @@ RSpec.describe RubyLLM::Providers::RedCandle do
           end
           RubyLLM::Message.new(
             content: tokens.join,
-            role: 'assistant',
-            model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
+            role: :assistant,
+            model_id: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
           )
         end
 

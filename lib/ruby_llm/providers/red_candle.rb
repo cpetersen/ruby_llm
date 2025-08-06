@@ -72,7 +72,10 @@ module RubyLLM
         ensure_red_candle_available!
         # This would be enhanced with caching in a real implementation
         device = get_device
-        ::Candle::LLM.from_pretrained(model_id, device: device)
+        puts "DEBUG: Loading model #{model_id} on device #{device.inspect}"
+        llm = ::Candle::LLM.from_pretrained(model_id, device: device)
+        puts "DEBUG: Model loaded: #{llm.inspect}"
+        llm
       end
 
       def get_device
