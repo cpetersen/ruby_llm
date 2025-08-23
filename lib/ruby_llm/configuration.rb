@@ -32,6 +32,7 @@ module RubyLLM
                   :red_candle_device,
                   :red_candle_model_cache_dir,
                   :red_candle_default_model,
+                  :red_candle_model_params,
                   # Default models
                   :default_model,
                   :default_embedding_model,

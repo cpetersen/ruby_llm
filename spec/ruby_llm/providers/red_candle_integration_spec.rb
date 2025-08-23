@@ -7,16 +7,26 @@ require 'spec_helper'
 RSpec.describe 'RedCandle Integration', skip: !defined?(Candle) do
   include_context 'with configured RubyLLM'
 
-  # Add red-candle to the test models if the gem is available
-  RED_CANDLE_TEST_MODELS = [
-    { provider: :red_candle, model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' }
-  ].freeze
+  # Test with Gemma GGUF model if available, otherwise use TinyLlama
+  RED_CANDLE_TEST_MODELS = if ENV['TEST_GEMMA_GGUF']
+    [{ provider: :red_candle, model: 'google/gemma-3-4b-it-qat-q4_0-gguf' }]
+  else
+    [{ provider: :red_candle, model: 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' }]
+  end.freeze
 
   before do
     # Configure red-candle settings
     RubyLLM.configure do |config|
-      config.red_candle_device = 'cpu' # Use CPU for tests
-      config.red_candle_default_model = 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
+      config.red_candle_device = ENV['TEST_GEMMA_GGUF'] ? 'metal' : 'cpu'
+      config.red_candle_default_model = RED_CANDLE_TEST_MODELS.first[:model]
+      
+      # Configure model-specific parameters for GGUF models
+      config.red_candle_model_params = {
+        'google/gemma-3-4b-it-qat-q4_0-gguf' => {
+          gguf_file: 'gemma-3-4b-it-q4_0.gguf',
+          tokenizer: 'google/gemma-3-4b-it'
+        }
+      }
     end
   end
 

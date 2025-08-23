@@ -37,11 +37,9 @@ module RubyLLM
           # Convert messages to format expected by red-candle
           formatted_messages = format_messages_for_chat(messages)
           
-          # For now, manually format the prompt since apply_chat_template seems broken
-          # for TinyLlama in red-candle
+          # Use red-candle's chat method
           if formatted_messages.is_a?(Array) && formatted_messages.any? { |m| m.is_a?(Hash) && m["role"] }
-            prompt = format_as_tinyllama_chat(formatted_messages)
-            response_text = llm.generate(prompt, config: config)
+            response_text = llm.chat(formatted_messages, config: config)
           else
             # Fall back to generate for simple prompts
             prompt = messages.is_a?(Array) ? messages.map(&:content).join("\n") : messages.to_s
@@ -57,10 +55,9 @@ module RubyLLM
           formatted_messages = format_messages_for_chat(messages)
           accumulated_text = ""
           
-          # For now, manually format the prompt since apply_chat_template seems broken
+          # Use red-candle's chat_stream method
           if formatted_messages.is_a?(Array) && formatted_messages.any? { |m| m.is_a?(Hash) && m["role"] }
-            prompt = format_as_tinyllama_chat(formatted_messages)
-            llm.generate_stream(prompt, config: config) do |token|
+            llm.chat_stream(formatted_messages, config: config) do |token|
               accumulated_text += token
               chunk = build_chunk(token, accumulated_text, llm.model_name)
               block.call(chunk) if block
@@ -79,31 +76,6 @@ module RubyLLM
           parse_completion_response(accumulated_text, llm)
         end
 
-        def format_as_tinyllama_chat(messages)
-          # Manually format messages for TinyLlama chat template
-          # Format: <|system|>\n{system}\n<|user|>\n{user}\n<|assistant|>\n{assistant}\n...
-          formatted = ""
-          
-          messages.each do |msg|
-            role = msg["role"] || msg[:role]
-            content = msg["content"] || msg[:content]
-            
-            case role.to_s
-            when "system"
-              formatted += "<|system|>\n#{content}\n"
-            when "user"
-              formatted += "<|user|>\n#{content}\n"
-            when "assistant"
-              formatted += "<|assistant|>\n#{content}\n"
-            end
-          end
-          
-          # Always end with assistant tag for generation
-          formatted += "<|assistant|>\n" unless formatted.end_with?("<|assistant|>\n")
-          
-          formatted
-        end
-        
         def format_messages_for_chat(messages)
           # Convert messages to the format expected by red-candle's chat method
           if messages.is_a?(Array)
@@ -130,32 +102,6 @@ module RubyLLM
           end
         end
         
-        def format_messages_for_model(llm, messages)
-          # This method is kept for backward compatibility but not actively used
-          # The complete_sync and complete_streaming methods now use format_messages_for_chat
-          # and call llm.chat directly
-          if messages.is_a?(Array)
-            formatted_messages = messages.map do |msg|
-              if msg.respond_to?(:to_h)
-                hash = msg.to_h
-                {
-                  "role" => hash[:role].to_s,
-                  "content" => hash[:content].to_s
-                }
-              else
-                msg
-              end
-            end
-            
-            if formatted_messages.any? { |m| m.is_a?(Hash) && (m["role"] || m[:role]) }
-              llm.apply_chat_template(formatted_messages)
-            else
-              formatted_messages.join("\n")
-            end
-          else
-            messages.to_s
-          end
-        end
 
         def parse_completion_response(text, llm)
           Message.new(

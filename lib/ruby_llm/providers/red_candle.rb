@@ -70,12 +70,17 @@ module RubyLLM
 
       def load_model(model_id)
         ensure_red_candle_available!
-        # This would be enhanced with caching in a real implementation
         device = get_device
-        puts "DEBUG: Loading model #{model_id} on device #{device.inspect}"
-        llm = ::Candle::LLM.from_pretrained(model_id, device: device)
-        puts "DEBUG: Model loaded: #{llm.inspect}"
-        llm
+        
+        # Check if there are model-specific params configured
+        model_params = RubyLLM.config.red_candle_model_params || {}
+        params_for_model = model_params[model_id] || {}
+        
+        # Merge device with any model-specific params
+        all_params = { device: device }.merge(params_for_model)
+        
+        # Load the model with all parameters
+        ::Candle::LLM.from_pretrained(model_id, **all_params)
       end
 
       def get_device
