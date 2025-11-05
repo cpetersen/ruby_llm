@@ -23,12 +23,17 @@ module RubyLLM
                   :gpustack_api_base,
                   :gpustack_api_key,
                   :mistral_api_key,
+                  # Red Candle configuration
+                  :red_candle_device,
                   # Default models
                   :default_model,
                   :default_embedding_model,
+                  :default_moderation_model,
                   :default_image_model,
                   # Model registry
                   :model_registry_class,
+                  # Rails integration
+                  :use_new_acts_as,
                   # Connection configuration
                   :request_timeout,
                   :max_retries,
@@ -52,7 +57,11 @@ module RubyLLM
 
       @default_model = 'gpt-4.1-nano'
       @default_embedding_model = 'text-embedding-3-small'
+      @default_moderation_model = 'omni-moderation-latest'
       @default_image_model = 'gpt-image-1'
+
+      @model_registry_class = 'Model'
+      @use_new_acts_as = false
 
       @log_file = $stdout
       @log_level = ENV['RUBYLLM_DEBUG'] ? Logger::DEBUG : Logger::INFO
